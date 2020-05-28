@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 import csv
 
 app = Flask(__name__)
@@ -22,12 +22,20 @@ def index():
     return render_template('region.html', ventas=d)
 
 
-    '''
-    <abrir fichero>
-    <mientras haya registros>
-        registro = leerFichero
-        registro. separar.por commas
-        procesar ventas totales y beneficios totales
-    Montar respuesta
-    devolver respuesta.
-    '''
+@app.route("/paises")
+def paises():
+    region_name = request.values['region']
+    fVentas = open('./sales.csv', 'r')
+    csvreader = csv.reader(fVentas, delimiter=',')
+
+    d = {}
+
+    for linea in csvreader:
+        if linea[0] == region_name:
+            if linea[1] in d:
+                d[linea[1]]['ingresos'] += float(linea[11])
+                d[linea[1]]['beneficios'] += float(linea[13])
+            else:     
+                d[linea[1]] = {'ingresos': float(linea[11]), 'beneficios': float(linea[13])}
+
+    return render_template('paises.html', ventas_pais=d, region_nm=request.values['region'])
