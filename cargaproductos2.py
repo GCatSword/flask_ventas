@@ -1,6 +1,8 @@
 import sqlite3
 import csv
 
+import time
+start_time = time.time()
 
 fVentas = open('./sales.csv', 'r')
 csvreader = csv.reader(fVentas, delimiter=',')
@@ -19,6 +21,10 @@ del registros[0] #borrar linea inicial, para evitar problemas con float.
 #print(registros)
 
 lst_productos=[]
+'''
+for linea in registros:
+    lst_productos += [linea[2], float(linea[9]), float(linea[10])]
+'''
 
 for linea in registros:
     lst_productos += [linea[2], float(linea[9]), float(linea[10])]
@@ -46,11 +52,10 @@ for p in sub_lst:
         pass
 '''
 
-
 # Con el REPLACE evitamos el problema si ya existe, pero no creo que sea la solución óptima.
 # problema con esto: al reemplazar uno existente, la ID del inicial desaparece y se sustituye por la ID del REPLACE.
 for p in sub_lst:
-    print(p)
+    #print(p)
     #c.execute("INSERT OR REPLACE INTO productos (tipo_producto, precio_unitario, coste_unitario) VALUES (?,?,?)", (p))
     c.execute("INSERT OR IGNORE INTO productos(tipo_producto, precio_unitario, coste_unitario) VALUES (?,?,?)", (p))
     c.execute("DELETE FROM sqlite_sequence WHERE name='productos'")
@@ -61,3 +66,4 @@ conn.commit()
 c.close()
 conn.close()
 
+print("--- %s seconds ---" % (time.time() - start_time))

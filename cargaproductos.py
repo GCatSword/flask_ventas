@@ -1,39 +1,25 @@
 import sqlite3
 import csv
 
+filename = "./sales.csv"
+database = "./data/ventas.db"
+
+fSales = open(filename, 'r')
+csvreader = csv.reader(fSales, delimiter=',')
+
+conn = sqlite3.connect(database)
+cur = conn.cursor()
+
+headerRow = next(csvreader)
+
+query = ("INSERT OR IGNORE INTO productos(tipo_producto, precio_unitario, coste_unitario) VALUES (?,?,?)")
+
+for dataRow in csvreader:
+    tupla_datos = ( dataRow[2], float(dataRow[9]), float(dataRow[10]) )
+    cur.execute(query, tupla_datos)
 
 
-fVentas = open('./sales10.csv', 'r')
-csvreader = csv.reader(fVentas, delimiter=',')
-
-conn = sqlite3.connect("./data/prueba.db")
-c = conn.cursor()
-
-registros=[]
-
-for linea in csvreader:
-    registros.append(linea)
-
-#print(len(registros))
-del registros[0]   
-#print(registros)
-
-
-
-for linea in registros:
-    p = [linea[2], float(linea[9]), float(linea[10])]
-    print(p)
-    try:
-        #print(d)
-        c.execute("INSERT INTO productos (tipo_producto, precio_unitario, coste_unitario) VALUES (?,?,?)", (p))
-    except sqlite3.Error:
-        #print(d)
-        pass
-    
-#print(d)
-
-#c.execute("INSERT INTO productos (tipo_producto, precio_unitario, coste_unitario) VALUES (?,?,?)", (p))
 
 conn.commit()
-c.close()
+cur.close()
 conn.close()
